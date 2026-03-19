@@ -312,12 +312,18 @@ async function doLookup() {
   area.innerHTML = '<div class="lookup-msg"><span class="lookup-spinner"></span>検索中…</div>';
 
   try {
-    const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&langRestrict=ja&maxResults=5&printType=books`;
-    const res = await fetch(url);
-    const data = await res.json();
+    let url = `https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(q)}&maxResults=5&printType=books`;
+    let res = await fetch(url);
+    let data = await res.json();
 
     if (!data.items || data.items.length === 0) {
-      area.innerHTML = '<div class="lookup-msg error">見つかりませんでした。別のキーワードを試してください。</div>';
+      url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=5&printType=books`;
+      res = await fetch(url);
+      data = await res.json();
+    }
+
+    if (!data.items || data.items.length === 0) {
+      area.innerHTML = '<div class="lookup-msg error">見つかりませんでした。別のキーワードや著者名で試してください。</div>';
       btn.disabled = false;
       return;
     }
