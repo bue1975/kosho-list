@@ -352,7 +352,7 @@ async function doLookup() {
 
     window._candidates = candidates;
   } catch(e) {
-    area.innerHTML = '<div class="lookup-msg error">通信エラーが発生しました。</div>';
+    area.innerHTML = '<div class="lookup-msg error">エラー：' + esc(String(e)) + '</div>';
   }
   btn.disabled = false;
 }
