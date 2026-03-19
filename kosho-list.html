@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="古書リスト">
+<meta name="theme-color" content="#1a1a18">
+<title>古書探索リスト</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700&family=Noto+Sans+JP:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1a1a18;
+  --ink2: #3d3d38;
+  --ink3: #7a7a72;
+  --ink4: #b0afa6;
+  --paper: #f5f2eb;
+  --paper2: #ede9e0;
+  --paper3: #e2ddd2;
+  --accent: #8b3a1e;
+  --accent2: #c4622d;
+  --gold: #b08840;
+  --green: #2d6a4f;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #ede9e0;
+    --ink2: #c8c4b8;
+    --ink3: #8a8880;
+    --ink4: #555550;
+    --paper: #1c1c19;
+    --paper2: #242420;
+    --paper3: #2e2e29;
+    --accent: #d4603a;
+    --accent2: #e8845a;
+    --gold: #c4a050;
+    --green: #52a87a;
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; background: var(--paper); color: var(--ink); font-family: 'Noto Sans JP', sans-serif; }
+body { display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; min-height: 100dvh; }
+
+/* Header */
+.hdr {
+  background: var(--ink);
+  color: var(--paper);
+  padding: calc(var(--safe-top) + 14px) 18px 14px;
+  position: sticky; top: 0; z-index: 100;
+}
+.hdr-top { display: flex; align-items: center; justify-content: space-between; }
+.hdr-title { font-family: 'Noto Serif JP', serif; font-size: 17px; font-weight: 700; letter-spacing: 0.08em; }
+.hdr-sub { font-size: 10px; color: var(--ink4); margin-top: 2px; letter-spacing: 0.1em; }
+.hdr-btn { background: var(--accent); color: white; border: none; border-radius: 6px; padding: 7px 14px; font-size: 13px; font-family: 'Noto Sans JP'; cursor: pointer; font-weight: 500; }
+.hdr-btn:active { opacity: 0.8; }
+
+/* Stats bar */
+.stats {
+  display: flex; background: var(--paper2); border-bottom: 1px solid var(--paper3);
+  padding: 10px 18px; gap: 0;
+}
+.stat { flex: 1; text-align: center; }
+.stat + .stat { border-left: 1px solid var(--paper3); }
+.stat-n { font-family: 'Noto Serif JP', serif; font-size: 22px; font-weight: 700; color: var(--ink); line-height: 1; }
+.stat-l { font-size: 10px; color: var(--ink3); margin-top: 3px; letter-spacing: 0.05em; }
+
+/* Tabs */
+.tabs { display: flex; background: var(--paper2); border-bottom: 1px solid var(--paper3); padding: 0 18px; gap: 0; }
+.tab { flex: 1; text-align: center; padding: 10px 4px; font-size: 12px; color: var(--ink3); border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; font-family: 'Noto Sans JP'; letter-spacing: 0.05em; }
+.tab.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
+
+/* Search */
+.search-bar { padding: 10px 18px; background: var(--paper2); display: flex; gap: 8px; border-bottom: 1px solid var(--paper3); }
+.search-bar input { flex: 1; background: var(--paper); border: 1px solid var(--paper3); border-radius: 6px; padding: 8px 12px; font-size: 13px; color: var(--ink); font-family: 'Noto Sans JP'; }
+.search-bar input::placeholder { color: var(--ink4); }
+.search-bar input:focus { outline: none; border-color: var(--ink3); }
+.sort-sel { background: var(--paper); border: 1px solid var(--paper3); border-radius: 6px; padding: 8px 8px; font-size: 12px; color: var(--ink3); font-family: 'Noto Sans JP'; }
+
+/* List */
+.list { flex: 1; overflow-y: auto; padding: 12px 18px; display: flex; flex-direction: column; gap: 8px; padding-bottom: calc(var(--safe-bottom) + 20px); }
+.empty { text-align: center; padding: 3rem 1rem; color: var(--ink4); font-size: 14px; line-height: 1.8; }
+
+/* Book card */
+.card {
+  background: var(--paper2); border: 1px solid var(--paper3); border-radius: 10px;
+  padding: 12px 14px; display: flex; gap: 12px; align-items: flex-start;
+  transition: opacity 0.2s;
+}
+.card.done { opacity: 0.45; }
+.chk {
+  width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--ink4);
+  background: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px; font-size: 13px; color: white; transition: all 0.15s;
+}
+.chk.on { background: var(--green); border-color: var(--green); }
+.info { flex: 1; min-width: 0; }
+.c-title { font-family: 'Noto Serif JP', serif; font-size: 14px; font-weight: 500; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.c-author { font-size: 11px; color: var(--ink3); margin-top: 3px; }
+.meta { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+.badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; letter-spacing: 0.03em; }
+.b-hi { background: #f5ede8; color: #8b3a1e; }
+.b-mi { background: #f5f0e0; color: #7a6020; }
+.b-lo { background: var(--paper3); color: var(--ink3); }
+.b-note { background: #e8eef5; color: #2a4a6a; }
+.b-price { background: var(--paper3); color: var(--ink3); }
+@media (prefers-color-scheme: dark) {
+  .b-hi { background: #3d1a0e; color: #e8845a; }
+  .b-mi { background: #302810; color: #c4a050; }
+  .b-note { background: #1a2a3a; color: #6aaadc; }
+}
+.del-btn { color: var(--ink4); background: none; border: none; cursor: pointer; font-size: 14px; padding: 2px 4px; flex-shrink: 0; border-radius: 4px; }
+.del-btn:active { color: var(--accent); }
+
+/* Add form overlay */
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: flex; align-items: flex-end; }
+.overlay.hidden { display: none; }
+.sheet {
+  background: var(--paper); border-radius: 18px 18px 0 0; width: 100%; max-width: 480px; margin: 0 auto;
+  padding: 20px 20px calc(var(--safe-bottom) + 20px);
+}
+.sheet-handle { width: 40px; height: 4px; background: var(--paper3); border-radius: 2px; margin: 0 auto 18px; }
+.sheet h2 { font-family: 'Noto Serif JP', serif; font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--ink); }
+.field { margin-bottom: 12px; }
+.field label { display: block; font-size: 11px; color: var(--ink3); margin-bottom: 4px; letter-spacing: 0.05em; }
+.field input, .field select, .field textarea {
+  width: 100%; background: var(--paper2); border: 1px solid var(--paper3); border-radius: 8px;
+  padding: 10px 12px; font-size: 14px; color: var(--ink); font-family: 'Noto Sans JP';
+}
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--ink3); }
+.field input::placeholder, .field textarea::placeholder { color: var(--ink4); }
+.field textarea { resize: none; height: 60px; }
+.field-row { display: flex; gap: 10px; }
+.field-row .field { flex: 1; }
+.btn-submit {
+  width: 100%; background: var(--accent); color: white; border: none; border-radius: 10px;
+  padding: 14px; font-size: 15px; font-weight: 500; font-family: 'Noto Sans JP'; cursor: pointer; margin-top: 4px;
+}
+.btn-submit:active { opacity: 0.85; }
+.btn-cancel { width: 100%; background: none; border: none; color: var(--ink3); font-size: 13px; font-family: 'Noto Sans JP'; padding: 12px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-top">
+    <div>
+      <div class="hdr-title">古書探索リスト</div>
+      <div class="hdr-sub">KOSHO SEARCH LIST</div>
+    </div>
+    <button class="hdr-btn" id="openAdd">＋ 追加</button>
+  </div>
+</div>
+
+<div class="stats" id="stats"></div>
+
+<div class="tabs">
+  <button class="tab on" data-tab="all">すべて</button>
+  <button class="tab" data-tab="want">未入手</button>
+  <button class="tab" data-tab="done">入手済み</button>
+</div>
+
+<div class="search-bar">
+  <input id="search" placeholder="タイトル・著者で検索…" type="search">
+  <select class="sort-sel" id="sort">
+    <option value="added">追加順</option>
+    <option value="pri">優先度順</option>
+    <option value="title">タイトル順</option>
+  </select>
+</div>
+
+<div class="list" id="list"></div>
+
+<!-- Add sheet -->
+<div class="overlay hidden" id="overlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <h2>本を追加</h2>
+    <div class="field">
+      <label>タイトル *</label>
+      <input id="fTitle" placeholder="書名を入力">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>著者・訳者</label>
+        <input id="fAuthor" placeholder="著者名">
+      </div>
+      <div class="field" style="max-width:110px;">
+        <label>上限価格（円）</label>
+        <input id="fPrice" type="number" placeholder="例: 800">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>優先度</label>
+        <select id="fPri">
+          <option value="hi">高</option>
+          <option value="mi" selected>中</option>
+          <option value="lo">低</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>ジャンル・分類</label>
+        <input id="fGenre" placeholder="例: 漫画論">
+      </div>
+    </div>
+    <div class="field">
+      <label>店舗メモ</label>
+      <textarea id="fNote" placeholder="例: 神保町で優先確認、〇〇書店に在庫あり？"></textarea>
+    </div>
+    <button class="btn-submit" id="saveBtn">保存する</button>
+    <button class="btn-cancel" id="closeAdd">キャンセル</button>
+  </div>
+</div>
+
+<script>
+const KEY = 'kosho-v2';
+let books = [], tab = 'all';
+
+function load() {
+  try { books = JSON.parse(localStorage.getItem(KEY)) || sample(); }
+  catch(e) { books = sample(); }
+  render();
+}
+
+function save() {
+  localStorage.setItem(KEY, JSON.stringify(books));
+}
+
+function sample() {
+  return [
+    { id: 1, title: '虫眼とアニ眼', author: '宮崎駿・養老孟司', price: '800', priority: 'hi', genre: 'アニメ論', note: 'ジブリ系古書店', done: false, added: Date.now()-5000 },
+    { id: 2, title: '漫画原稿料はなぜ安いのか', author: '赤松健', price: '600', priority: 'mi', genre: '漫画論', note: '', done: false, added: Date.now()-4000 },
+    { id: 3, title: 'パトレイバーの時代', author: '押井守', price: '1200', priority: 'hi', genre: 'アニメ論', note: '神保町で優先確認', done: true, added: Date.now()-3000 },
+  ];
+}
+
+function render() {
+  renderStats();
+  renderList();
+}
+
+function renderStats() {
+  const total = books.length;
+  const done = books.filter(b => b.done).length;
+  const hi = books.filter(b => b.priority === 'hi' && !b.done).length;
+  document.getElementById('stats').innerHTML = `
+    <div class="stat"><div class="stat-n">${total}</div><div class="stat-l">総数</div></div>
+    <div class="stat"><div class="stat-n">${total - done}</div><div class="stat-l">未入手</div></div>
+    <div class="stat"><div class="stat-n">${done}</div><div class="stat-l">入手済み</div></div>
+    <div class="stat"><div class="stat-n">${hi}</div><div class="stat-l">高優先</div></div>
+  `;
+}
+
+function renderList() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const s = document.getElementById('sort').value;
+  const priO = {hi:0, mi:1, lo:2};
+  let list = books.filter(b => {
+    if (tab === 'want' && b.done) return false;
+    if (tab === 'done' && !b.done) return false;
+    if (q && !b.title.toLowerCase().includes(q) && !(b.author||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+  if (s === 'pri') list.sort((a,b) => priO[a.priority] - priO[b.priority]);
+  else if (s === 'title') list.sort((a,b) => a.title.localeCompare(b.title, 'ja'));
+  else list.sort((a,b) => b.added - a.added);
+
+  const el = document.getElementById('list');
+  if (!list.length) { el.innerHTML = '<div class="empty">該当する本がありません</div>'; return; }
+
+  const priL = {hi:'優先：高', mi:'優先：中', lo:'優先：低'};
+  const priC = {hi:'b-hi', mi:'b-mi', lo:'b-lo'};
+  el.innerHTML = list.map(b => `
+    <div class="card ${b.done ? 'done' : ''}">
+      <button class="chk ${b.done ? 'on' : ''}" onclick="toggle(${b.id})">${b.done ? '✓' : ''}</button>
+      <div class="info">
+        <div class="c-title">${esc(b.title)}</div>
+        ${b.author ? `<div class="c-author">${esc(b.author)}</div>` : ''}
+        <div class="meta">
+          <span class="badge ${priC[b.priority]}">${priL[b.priority]}</span>
+          ${b.genre ? `<span class="badge b-lo">${esc(b.genre)}</span>` : ''}
+          ${b.price ? `<span class="badge b-price">〜${Number(b.price).toLocaleString()}円</span>` : ''}
+          ${b.note ? `<span class="badge b-note">${esc(b.note)}</span>` : ''}
+        </div>
+      </div>
+      <button class="del-btn" onclick="del(${b.id})">✕</button>
+    </div>
+  `).join('');
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function toggle(id) {
+  const b = books.find(x => x.id === id);
+  if (b) { b.done = !b.done; save(); render(); }
+}
+
+function del(id) {
+  if (!confirm('削除しますか？')) return;
+  books = books.filter(x => x.id !== id);
+  save(); render();
+}
+
+// Tabs
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
+    t.classList.add('on');
+    tab = t.dataset.tab;
+    render();
+  });
+});
+
+// Search / Sort
+document.getElementById('search').addEventListener('input', render);
+document.getElementById('sort').addEventListener('change', render);
+
+// Add sheet
+document.getElementById('openAdd').addEventListener('click', () => {
+  document.getElementById('overlay').classList.remove('hidden');
+});
+function closeSheet() {
+  document.getElementById('overlay').classList.add('hidden');
+}
+document.getElementById('closeAdd').addEventListener('click', closeSheet);
+document.getElementById('overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('overlay')) closeSheet();
+});
+
+document.getElementById('saveBtn').addEventListener('click', () => {
+  const title = document.getElementById('fTitle').value.trim();
+  if (!title) { document.getElementById('fTitle').focus(); return; }
+  books.unshift({
+    id: Date.now(),
+    title,
+    author: document.getElementById('fAuthor').value.trim(),
+    price: document.getElementById('fPrice').value.trim(),
+    priority: document.getElementById('fPri').value,
+    genre: document.getElementById('fGenre').value.trim(),
+    note: document.getElementById('fNote').value.trim(),
+    done: false,
+    added: Date.now()
+  });
+  ['fTitle','fAuthor','fPrice','fGenre','fNote'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fPri').value = 'mi';
+  closeSheet(); save(); render();
+});
+
+load();
+</script>
+</body>
+</html>
