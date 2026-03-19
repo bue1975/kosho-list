@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="古書リスト">
@@ -25,8 +25,8 @@
   }
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; background: var(--paper); color: var(--ink); font-family: 'Noto Sans JP', sans-serif; }
-body { display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; min-height: 100dvh; }
+html { height: 100%; overflow: hidden; -webkit-text-size-adjust: 100%; }
+body { position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; background: var(--paper); color: var(--ink); font-family: 'Noto Sans JP', sans-serif; display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; }
 
 .hdr { background: var(--ink); color: var(--paper); padding: calc(var(--safe-top) + 14px) 18px 14px; position: sticky; top: 0; z-index: 100; }
 .hdr-top { display: flex; align-items: center; justify-content: space-between; }
