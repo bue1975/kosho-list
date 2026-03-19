@@ -12,90 +12,51 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700&family=Noto+Sans+JP:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --ink: #1a1a18;
-  --ink2: #3d3d38;
-  --ink3: #7a7a72;
-  --ink4: #b0afa6;
-  --paper: #f5f2eb;
-  --paper2: #ede9e0;
-  --paper3: #e2ddd2;
-  --accent: #8b3a1e;
-  --accent2: #c4622d;
-  --gold: #b08840;
-  --green: #2d6a4f;
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --ink: #1a1a18; --ink2: #3d3d38; --ink3: #7a7a72; --ink4: #b0afa6;
+  --paper: #f5f2eb; --paper2: #ede9e0; --paper3: #e2ddd2;
+  --accent: #8b3a1e; --green: #2d6a4f;
+  --safe-top: env(safe-area-inset-top, 0px); --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --ink: #ede9e0;
-    --ink2: #c8c4b8;
-    --ink3: #8a8880;
-    --ink4: #555550;
-    --paper: #1c1c19;
-    --paper2: #242420;
-    --paper3: #2e2e29;
-    --accent: #d4603a;
-    --accent2: #e8845a;
-    --gold: #c4a050;
-    --green: #52a87a;
+    --ink: #ede9e0; --ink2: #c8c4b8; --ink3: #8a8880; --ink4: #555550;
+    --paper: #1c1c19; --paper2: #242420; --paper3: #2e2e29;
+    --accent: #d4603a; --green: #52a87a;
   }
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body { height: 100%; background: var(--paper); color: var(--ink); font-family: 'Noto Sans JP', sans-serif; }
 body { display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; min-height: 100dvh; }
 
-/* Header */
-.hdr {
-  background: var(--ink);
-  color: var(--paper);
-  padding: calc(var(--safe-top) + 14px) 18px 14px;
-  position: sticky; top: 0; z-index: 100;
-}
+.hdr { background: var(--ink); color: var(--paper); padding: calc(var(--safe-top) + 14px) 18px 14px; position: sticky; top: 0; z-index: 100; }
 .hdr-top { display: flex; align-items: center; justify-content: space-between; }
 .hdr-title { font-family: 'Noto Serif JP', serif; font-size: 17px; font-weight: 700; letter-spacing: 0.08em; }
 .hdr-sub { font-size: 10px; color: var(--ink4); margin-top: 2px; letter-spacing: 0.1em; }
 .hdr-btn { background: var(--accent); color: white; border: none; border-radius: 6px; padding: 7px 14px; font-size: 13px; font-family: 'Noto Sans JP'; cursor: pointer; font-weight: 500; }
 .hdr-btn:active { opacity: 0.8; }
 
-/* Stats bar */
-.stats {
-  display: flex; background: var(--paper2); border-bottom: 1px solid var(--paper3);
-  padding: 10px 18px; gap: 0;
-}
+.stats { display: flex; background: var(--paper2); border-bottom: 1px solid var(--paper3); padding: 10px 18px; }
 .stat { flex: 1; text-align: center; }
 .stat + .stat { border-left: 1px solid var(--paper3); }
 .stat-n { font-family: 'Noto Serif JP', serif; font-size: 22px; font-weight: 700; color: var(--ink); line-height: 1; }
 .stat-l { font-size: 10px; color: var(--ink3); margin-top: 3px; letter-spacing: 0.05em; }
 
-/* Tabs */
-.tabs { display: flex; background: var(--paper2); border-bottom: 1px solid var(--paper3); padding: 0 18px; gap: 0; }
+.tabs { display: flex; background: var(--paper2); border-bottom: 1px solid var(--paper3); padding: 0 18px; }
 .tab { flex: 1; text-align: center; padding: 10px 4px; font-size: 12px; color: var(--ink3); border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; font-family: 'Noto Sans JP'; letter-spacing: 0.05em; }
 .tab.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
 
-/* Search */
 .search-bar { padding: 10px 18px; background: var(--paper2); display: flex; gap: 8px; border-bottom: 1px solid var(--paper3); }
 .search-bar input { flex: 1; background: var(--paper); border: 1px solid var(--paper3); border-radius: 6px; padding: 8px 12px; font-size: 13px; color: var(--ink); font-family: 'Noto Sans JP'; }
 .search-bar input::placeholder { color: var(--ink4); }
 .search-bar input:focus { outline: none; border-color: var(--ink3); }
 .sort-sel { background: var(--paper); border: 1px solid var(--paper3); border-radius: 6px; padding: 8px 8px; font-size: 12px; color: var(--ink3); font-family: 'Noto Sans JP'; }
 
-/* List */
 .list { flex: 1; overflow-y: auto; padding: 12px 18px; display: flex; flex-direction: column; gap: 8px; padding-bottom: calc(var(--safe-bottom) + 20px); }
 .empty { text-align: center; padding: 3rem 1rem; color: var(--ink4); font-size: 14px; line-height: 1.8; }
 
-/* Book card */
-.card {
-  background: var(--paper2); border: 1px solid var(--paper3); border-radius: 10px;
-  padding: 12px 14px; display: flex; gap: 12px; align-items: flex-start;
-  transition: opacity 0.2s;
-}
+.card { background: var(--paper2); border: 1px solid var(--paper3); border-radius: 10px; padding: 12px 14px; display: flex; gap: 12px; align-items: flex-start; transition: opacity 0.2s; }
 .card.done { opacity: 0.45; }
-.chk {
-  width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--ink4);
-  background: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; margin-top: 1px; font-size: 13px; color: white; transition: all 0.15s;
-}
+.chk { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--ink4); background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; font-size: 13px; color: white; transition: all 0.15s; }
 .chk.on { background: var(--green); border-color: var(--green); }
 .info { flex: 1; min-width: 0; }
 .c-title { font-family: 'Noto Serif JP', serif; font-size: 14px; font-weight: 500; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -115,30 +76,45 @@ body { display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; 
 .del-btn { color: var(--ink4); background: none; border: none; cursor: pointer; font-size: 14px; padding: 2px 4px; flex-shrink: 0; border-radius: 4px; }
 .del-btn:active { color: var(--accent); }
 
-/* Add form overlay */
 .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: flex; align-items: flex-end; }
 .overlay.hidden { display: none; }
-.sheet {
-  background: var(--paper); border-radius: 18px 18px 0 0; width: 100%; max-width: 480px; margin: 0 auto;
-  padding: 20px 20px calc(var(--safe-bottom) + 20px);
-}
+.sheet { background: var(--paper); border-radius: 18px 18px 0 0; width: 100%; max-width: 480px; margin: 0 auto; padding: 20px 20px calc(var(--safe-bottom) + 20px); max-height: 92dvh; overflow-y: auto; }
 .sheet-handle { width: 40px; height: 4px; background: var(--paper3); border-radius: 2px; margin: 0 auto 18px; }
 .sheet h2 { font-family: 'Noto Serif JP', serif; font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--ink); }
 .field { margin-bottom: 12px; }
 .field label { display: block; font-size: 11px; color: var(--ink3); margin-bottom: 4px; letter-spacing: 0.05em; }
-.field input, .field select, .field textarea {
-  width: 100%; background: var(--paper2); border: 1px solid var(--paper3); border-radius: 8px;
-  padding: 10px 12px; font-size: 14px; color: var(--ink); font-family: 'Noto Sans JP';
-}
+.field input, .field select, .field textarea { width: 100%; background: var(--paper2); border: 1px solid var(--paper3); border-radius: 8px; padding: 10px 12px; font-size: 14px; color: var(--ink); font-family: 'Noto Sans JP'; }
 .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--ink3); }
 .field input::placeholder, .field textarea::placeholder { color: var(--ink4); }
 .field textarea { resize: none; height: 60px; }
 .field-row { display: flex; gap: 10px; }
 .field-row .field { flex: 1; }
-.btn-submit {
-  width: 100%; background: var(--accent); color: white; border: none; border-radius: 10px;
-  padding: 14px; font-size: 15px; font-weight: 500; font-family: 'Noto Sans JP'; cursor: pointer; margin-top: 4px;
-}
+
+.lookup-row { display: flex; gap: 8px; margin-bottom: 8px; }
+.lookup-row input { flex: 1; background: var(--paper2); border: 1px solid var(--paper3); border-radius: 8px; padding: 10px 12px; font-size: 14px; color: var(--ink); font-family: 'Noto Sans JP'; }
+.lookup-row input::placeholder { color: var(--ink4); }
+.lookup-row input:focus { outline: none; border-color: var(--ink3); }
+.btn-lookup { background: var(--ink); color: var(--paper); border: none; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-family: 'Noto Sans JP'; cursor: pointer; white-space: nowrap; font-weight: 500; }
+.btn-lookup:active { opacity: 0.8; }
+.btn-lookup:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.candidates { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.candidate { background: var(--paper2); border: 1px solid var(--paper3); border-radius: 8px; padding: 10px 12px; cursor: pointer; transition: border-color 0.15s; }
+.candidate:active { border-color: var(--accent); }
+.candidate-title { font-size: 13px; font-weight: 500; color: var(--ink); font-family: 'Noto Serif JP', serif; }
+.candidate-sub { font-size: 11px; color: var(--ink3); margin-top: 3px; }
+
+.lookup-msg { font-size: 12px; color: var(--ink3); padding: 8px 0; }
+.lookup-msg.error { color: var(--accent); }
+.lookup-spinner { display: inline-block; width: 13px; height: 13px; border: 2px solid var(--paper3); border-top-color: var(--ink3); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.divider { border: none; border-top: 1px solid var(--paper3); margin: 8px 0 20px; }
+.divider-wrap { position: relative; margin: 8px 0 20px; }
+.divider-wrap hr { border: none; border-top: 1px solid var(--paper3); }
+.divider-wrap span { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); background: var(--paper); padding: 0 10px; font-size: 10px; color: var(--ink4); white-space: nowrap; }
+
+.btn-submit { width: 100%; background: var(--accent); color: white; border: none; border-radius: 10px; padding: 14px; font-size: 15px; font-weight: 500; font-family: 'Noto Sans JP'; cursor: pointer; margin-top: 4px; }
 .btn-submit:active { opacity: 0.85; }
 .btn-cancel { width: 100%; background: none; border: none; color: var(--ink3); font-size: 13px; font-family: 'Noto Sans JP'; padding: 12px; cursor: pointer; }
 </style>
@@ -174,11 +150,25 @@ body { display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; 
 
 <div class="list" id="list"></div>
 
-<!-- Add sheet -->
 <div class="overlay hidden" id="overlay">
   <div class="sheet">
     <div class="sheet-handle"></div>
     <h2>本を追加</h2>
+
+    <div class="field">
+      <label>書名で書誌情報を検索（Google Books）</label>
+      <div class="lookup-row">
+        <input id="lookupQ" placeholder="書名・著者名を入力…">
+        <button class="btn-lookup" id="lookupBtn">検索</button>
+      </div>
+      <div id="lookupArea"></div>
+    </div>
+
+    <div class="divider-wrap">
+      <hr>
+      <span>または手動入力</span>
+    </div>
+
     <div class="field">
       <label>タイトル *</label>
       <input id="fTitle" placeholder="書名を入力">
@@ -191,6 +181,16 @@ body { display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; 
       <div class="field" style="max-width:110px;">
         <label>上限価格（円）</label>
         <input id="fPrice" type="number" placeholder="例: 800">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>ISBN</label>
+        <input id="fIsbn" placeholder="9784…">
+      </div>
+      <div class="field">
+        <label>出版社</label>
+        <input id="fPublisher" placeholder="例: 岩波書店">
       </div>
     </div>
     <div class="field-row">
@@ -217,7 +217,7 @@ body { display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; 
 </div>
 
 <script>
-const KEY = 'kosho-v2';
+const KEY = 'kosho-v3';
 let books = [], tab = 'all';
 
 function load() {
@@ -226,22 +226,17 @@ function load() {
   render();
 }
 
-function save() {
-  localStorage.setItem(KEY, JSON.stringify(books));
-}
+function save() { localStorage.setItem(KEY, JSON.stringify(books)); }
 
 function sample() {
   return [
-    { id: 1, title: '虫眼とアニ眼', author: '宮崎駿・養老孟司', price: '800', priority: 'hi', genre: 'アニメ論', note: 'ジブリ系古書店', done: false, added: Date.now()-5000 },
-    { id: 2, title: '漫画原稿料はなぜ安いのか', author: '赤松健', price: '600', priority: 'mi', genre: '漫画論', note: '', done: false, added: Date.now()-4000 },
-    { id: 3, title: 'パトレイバーの時代', author: '押井守', price: '1200', priority: 'hi', genre: 'アニメ論', note: '神保町で優先確認', done: true, added: Date.now()-3000 },
+    { id: 1, title: '虫眼とアニ眼', author: '宮崎駿・養老孟司', price: '800', priority: 'hi', genre: 'アニメ論', note: 'ジブリ系古書店', isbn: '', publisher: '', done: false, added: Date.now()-5000 },
+    { id: 2, title: '漫画原稿料はなぜ安いのか', author: '赤松健', price: '600', priority: 'mi', genre: '漫画論', note: '', isbn: '', publisher: '', done: false, added: Date.now()-4000 },
+    { id: 3, title: 'パトレイバーの時代', author: '押井守', price: '1200', priority: 'hi', genre: 'アニメ論', note: '神保町で優先確認', isbn: '', publisher: '', done: true, added: Date.now()-3000 },
   ];
 }
 
-function render() {
-  renderStats();
-  renderList();
-}
+function render() { renderStats(); renderList(); }
 
 function renderStats() {
   const total = books.length;
@@ -279,10 +274,11 @@ function renderList() {
       <button class="chk ${b.done ? 'on' : ''}" onclick="toggle(${b.id})">${b.done ? '✓' : ''}</button>
       <div class="info">
         <div class="c-title">${esc(b.title)}</div>
-        ${b.author ? `<div class="c-author">${esc(b.author)}</div>` : ''}
+        ${b.author ? `<div class="c-author">${esc(b.author)}${b.publisher ? '　' + esc(b.publisher) : ''}</div>` : ''}
         <div class="meta">
           <span class="badge ${priC[b.priority]}">${priL[b.priority]}</span>
           ${b.genre ? `<span class="badge b-lo">${esc(b.genre)}</span>` : ''}
+          ${b.isbn ? `<span class="badge b-lo">ISBN ${esc(b.isbn)}</span>` : ''}
           ${b.price ? `<span class="badge b-price">〜${Number(b.price).toLocaleString()}円</span>` : ''}
           ${b.note ? `<span class="badge b-note">${esc(b.note)}</span>` : ''}
         </div>
@@ -307,7 +303,65 @@ function del(id) {
   save(); render();
 }
 
-// Tabs
+async function doLookup() {
+  const q = document.getElementById('lookupQ').value.trim();
+  if (!q) return;
+  const btn = document.getElementById('lookupBtn');
+  const area = document.getElementById('lookupArea');
+  btn.disabled = true;
+  area.innerHTML = '<div class="lookup-msg"><span class="lookup-spinner"></span>検索中…</div>';
+
+  try {
+    const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&langRestrict=ja&maxResults=5&printType=books`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (!data.items || data.items.length === 0) {
+      area.innerHTML = '<div class="lookup-msg error">見つかりませんでした。別のキーワードを試してください。</div>';
+      btn.disabled = false;
+      return;
+    }
+
+    const candidates = data.items.slice(0, 4).map(item => {
+      const info = item.volumeInfo;
+      const isbn13 = (info.industryIdentifiers || []).find(x => x.type === 'ISBN_13');
+      const isbn10 = (info.industryIdentifiers || []).find(x => x.type === 'ISBN_10');
+      return {
+        title: info.title || '',
+        author: (info.authors || []).join('・'),
+        publisher: info.publisher || '',
+        year: info.publishedDate ? info.publishedDate.slice(0,4) : '',
+        isbn: isbn13 ? isbn13.identifier : (isbn10 ? isbn10.identifier : ''),
+        genre: (info.categories || []).join('・'),
+      };
+    });
+
+    area.innerHTML = '<div class="candidates">' + candidates.map((c, i) => `
+      <div class="candidate" onclick="applyCandidate(${i})">
+        <div class="candidate-title">${esc(c.title)}</div>
+        <div class="candidate-sub">${[c.author, c.publisher, c.year].filter(Boolean).join('　')}</div>
+        ${c.isbn ? `<div class="candidate-sub">ISBN ${esc(c.isbn)}</div>` : ''}
+      </div>
+    `).join('') + '</div>';
+
+    window._candidates = candidates;
+  } catch(e) {
+    area.innerHTML = '<div class="lookup-msg error">通信エラーが発生しました。</div>';
+  }
+  btn.disabled = false;
+}
+
+function applyCandidate(i) {
+  const c = window._candidates[i];
+  if (!c) return;
+  if (c.title) document.getElementById('fTitle').value = c.title;
+  if (c.author) document.getElementById('fAuthor').value = c.author;
+  if (c.publisher) document.getElementById('fPublisher').value = c.publisher;
+  if (c.isbn) document.getElementById('fIsbn').value = c.isbn;
+  if (c.genre) document.getElementById('fGenre').value = c.genre;
+  document.getElementById('lookupArea').innerHTML = '<div class="lookup-msg">✓ 反映しました。内容を確認して保存してください。</div>';
+}
+
 document.querySelectorAll('.tab').forEach(t => {
   t.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
@@ -317,37 +371,41 @@ document.querySelectorAll('.tab').forEach(t => {
   });
 });
 
-// Search / Sort
 document.getElementById('search').addEventListener('input', render);
 document.getElementById('sort').addEventListener('change', render);
 
-// Add sheet
 document.getElementById('openAdd').addEventListener('click', () => {
   document.getElementById('overlay').classList.remove('hidden');
 });
 function closeSheet() {
   document.getElementById('overlay').classList.add('hidden');
+  document.getElementById('lookupArea').innerHTML = '';
+  document.getElementById('lookupQ').value = '';
+  window._candidates = [];
 }
 document.getElementById('closeAdd').addEventListener('click', closeSheet);
 document.getElementById('overlay').addEventListener('click', e => {
   if (e.target === document.getElementById('overlay')) closeSheet();
 });
 
+document.getElementById('lookupBtn').addEventListener('click', doLookup);
+document.getElementById('lookupQ').addEventListener('keydown', e => { if (e.key === 'Enter') doLookup(); });
+
 document.getElementById('saveBtn').addEventListener('click', () => {
   const title = document.getElementById('fTitle').value.trim();
   if (!title) { document.getElementById('fTitle').focus(); return; }
   books.unshift({
-    id: Date.now(),
-    title,
+    id: Date.now(), title,
     author: document.getElementById('fAuthor').value.trim(),
     price: document.getElementById('fPrice').value.trim(),
     priority: document.getElementById('fPri').value,
     genre: document.getElementById('fGenre').value.trim(),
     note: document.getElementById('fNote').value.trim(),
-    done: false,
-    added: Date.now()
+    isbn: document.getElementById('fIsbn').value.trim(),
+    publisher: document.getElementById('fPublisher').value.trim(),
+    done: false, added: Date.now()
   });
-  ['fTitle','fAuthor','fPrice','fGenre','fNote'].forEach(id => document.getElementById(id).value = '');
+  ['fTitle','fAuthor','fPrice','fGenre','fNote','fIsbn','fPublisher'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('fPri').value = 'mi';
   closeSheet(); save(); render();
 });
