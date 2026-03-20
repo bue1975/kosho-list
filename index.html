@@ -313,9 +313,9 @@ async function doLookup() {
   area.innerHTML = '<div class="lookup-msg"><span class="lookup-spinner"></span>検索中…</div>';
 
   try {
-    const url = `https://iss.ndl.go.jp/api/opensearch?title=${encodeURIComponent(q)}&mediatype=1&cnt=5`;
+    const url = `https://ndlsearch.ndl.go.jp/api/opensearch?title=${encodeURIComponent(q)}&cnt=5`;
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 8000);
+    const timer = setTimeout(() => controller.abort(), 10000);
     const res = await fetch(url, { signal: controller.signal });
     clearTimeout(timer);
     const text = await res.text();
@@ -328,15 +328,17 @@ async function doLookup() {
       return;
     }
 
+    const getNS = (item, ns, tag) => item.getElementsByTagNameNS(ns, tag)[0]?.textContent?.trim() || '';
     const get = (item, tag) => item.querySelector(tag)?.textContent?.trim() || '';
+    const DC = 'http://purl.org/dc/elements/1.1/';
     const candidates = items.slice(0, 4).map(item => {
-      const rawIsbn = get(item, 'identifier');
+      const rawIsbn = getNS(item, DC, 'identifier') || get(item, 'identifier');
       const isbn = rawIsbn.replace(/[^0-9X]/gi, '');
       return {
-        title: get(item, 'title').replace(/\s*\/.*$/, '').trim(),
-        author: get(item, 'author'),
-        publisher: get(item, 'publisher'),
-        year: get(item, 'pubDate').slice(0, 4),
+        title: (getNS(item, DC, 'title') || get(item, 'title')).replace(/\/.*$/, '').trim(),
+        author: getNS(item, DC, 'creator') || get(item, 'author'),
+        publisher: getNS(item, DC, 'publisher') || get(item, 'publisher'),
+        year: (getNS(item, DC, 'date') || get(item, 'pubDate')).slice(0, 4),
         isbn: isbn.length >= 10 ? isbn : '',
         genre: '',
       };
@@ -416,11 +418,3 @@ document.getElementById('saveBtn').addEventListener('click', () => {
     done: false, added: Date.now()
   });
   ['fTitle','fAuthor','fPrice','fGenre','fNote','fIsbn','fPublisher'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('fPri').value = 'mi';
-  closeSheet(); save(); render();
-});
-
-load();
-</script>
-</body>
-</html>
