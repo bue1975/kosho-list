@@ -313,29 +313,40 @@ async function doLookup() {
   area.innerHTML = '<div class="lookup-msg"><span class="lookup-spinner"></span>検索中…</div>';
 
   try {
-    const url = `https://iss.ndl.go.jp/api/opensearch?title=${encodeURIComponent(q)}&mediatype=1&cnt=5`;
-    const res = await fetch(url);
-    const text = await res.text();
-    const xml = new DOMParser().parseFromString(text, 'application/xml');
-    const items = Array.from(xml.querySelectorAll('item'));
+    const apiKey = 'AIzaSyDhh83IwIWemMoCjQyAsmrW3VEDh5-6_MQ';
+    let items = null;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 10000);
+    const res1 = await fetch(`https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(q)}&key=${apiKey}&maxResults=5&printType=books`, { signal: controller.signal });
+    clearTimeout(timer);
+    const data1 = await res1.json();
+    if (data1.items && data1.items.length > 0) {
+      items = data1.items;
+    } else {
+      const res2 = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&key=${apiKey}&maxResults=5&printType=books`);
+      const data2 = await res2.json();
+      if (data2.items && data2.items.length > 0) {
+        items = data2.items;
+      }
+    }
 
-    if (!items.length) {
+    if (!items) {
       area.innerHTML = '<div class="lookup-msg error">見つかりませんでした。別のキーワードや著者名で試してください。</div>';
       btn.disabled = false;
       return;
     }
 
-    const get = (item, tag) => item.querySelector(tag)?.textContent?.trim() || '';
     const candidates = items.slice(0, 4).map(item => {
-      const rawIsbn = get(item, 'identifier');
-      const isbn = rawIsbn.replace(/[^0-9X]/gi, '');
+      const info = item.volumeInfo;
+      const isbn13 = (info.industryIdentifiers || []).find(x => x.type === 'ISBN_13');
+      const isbn10 = (info.industryIdentifiers || []).find(x => x.type === 'ISBN_10');
       return {
-        title: get(item, 'title').replace(/\s*\/.*$/, '').trim(),
-        author: get(item, 'author'),
-        publisher: get(item, 'publisher'),
-        year: get(item, 'pubDate').slice(0, 4),
-        isbn: isbn.length >= 10 ? isbn : '',
-        genre: '',
+        title: info.title || '',
+        author: (info.authors || []).join('・'),
+        publisher: info.publisher || '',
+        year: info.publishedDate ? info.publishedDate.slice(0,4) : '',
+        isbn: isbn13 ? isbn13.identifier : (isbn10 ? isbn10.identifier : ''),
+        genre: (info.categories || []).join('・'),
       };
     });
 
@@ -349,7 +360,11 @@ async function doLookup() {
 
     window._candidates = candidates;
   } catch(e) {
-    area.innerHTML = '<div class="lookup-msg error">エラー：' + esc(String(e)) + '</div>';
+    if (e.name === 'AbortError') {
+      area.innerHTML = '<div class="lookup-msg error">タイムアウトしました。時間をおいて再試行してください。</div>';
+    } else {
+      area.innerHTML = '<div class="lookup-msg error">エラー：' + esc(String(e)) + '</div>';
+    }
   }
   btn.disabled = false;
 }
