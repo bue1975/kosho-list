@@ -128,7 +128,7 @@ body{position:fixed;top:0;left:0;right:0;bottom:0;overflow:hidden;background:var
     <div class="handle"></div>
     <h2>本を追加</h2>
     <div class="fld">
-      <label>書誌情報を検索（Google Books）<button class="keybtn" id="btnKey">APIキー設定</button></label>
+      <label>書誌情報を検索（Google Books）</label>
       <div class="lrow">
         <input id="lq" placeholder="書名・著者名を入力…">
         <button class="lbtn" id="btnLookup">検索</button>
@@ -161,7 +161,7 @@ body{position:fixed;top:0;left:0;right:0;bottom:0;overflow:hidden;background:var
 var KEY = 'kosho-v4';
 var books = [];
 var curTab = 'all';
-var gbKey = sessionStorage.getItem('gbk') || '';
+var gbKey = 'AIzaSyBc2rm7Kik_rE0AEenoRAYg-MI4QesXovE';
 var cands = [];
 
 function load() {
@@ -326,7 +326,6 @@ document.getElementById('btnKey').onclick = function() {
   var k = prompt('Google Books APIキーを入力：');
   if (k && k.trim()) {
     gbKey = k.trim();
-    sessionStorage.setItem('gbk', gbKey);
     alert('設定しました。');
   }
 };
