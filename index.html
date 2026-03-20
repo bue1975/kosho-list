@@ -322,14 +322,6 @@ document.getElementById('ovl').onclick = function(e) { if (e.target === this) cl
 document.getElementById('btnLookup').onclick = doLookup;
 document.getElementById('lq').onkeydown = function(e) { if (e.key === 'Enter') doLookup(); };
 
-document.getElementById('btnKey').onclick = function() {
-  var k = prompt('Google Books APIキーを入力：');
-  if (k && k.trim()) {
-    gbKey = k.trim();
-    alert('設定しました。');
-  }
-};
-
 document.getElementById('btnSave').onclick = function() {
   var title = document.getElementById('fT').value.trim();
   if (!title) { document.getElementById('fT').focus(); return; }
