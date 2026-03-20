@@ -156,7 +156,7 @@ body { position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; 
     <h2>本を追加</h2>
 
     <div class="field">
-      <label>書名で書誌情報を検索（国立国会図書館）</label>
+      <label>書名で書誌情報を検索（Google Books）</label>
       <div class="lookup-row">
         <input id="lookupQ" placeholder="書名・著者名を入力…">
         <button class="btn-lookup" id="lookupBtn">検索</button>
@@ -313,11 +313,8 @@ async function doLookup() {
   area.innerHTML = '<div class="lookup-msg"><span class="lookup-spinner"></span>検索中…</div>';
 
   try {
-    const url = `https://ndlsearch.ndl.go.jp/api/opensearch?title=${encodeURIComponent(q)}&cnt=5`;
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 10000);
-    const res = await fetch(url, { signal: controller.signal });
-    clearTimeout(timer);
+    const url = `https://iss.ndl.go.jp/api/opensearch?title=${encodeURIComponent(q)}&mediatype=1&cnt=5`;
+    const res = await fetch(url);
     const text = await res.text();
     const xml = new DOMParser().parseFromString(text, 'application/xml');
     const items = Array.from(xml.querySelectorAll('item'));
@@ -328,17 +325,15 @@ async function doLookup() {
       return;
     }
 
-    const getNS = (item, ns, tag) => item.getElementsByTagNameNS(ns, tag)[0]?.textContent?.trim() || '';
     const get = (item, tag) => item.querySelector(tag)?.textContent?.trim() || '';
-    const DC = 'http://purl.org/dc/elements/1.1/';
     const candidates = items.slice(0, 4).map(item => {
-      const rawIsbn = getNS(item, DC, 'identifier') || get(item, 'identifier');
+      const rawIsbn = get(item, 'identifier');
       const isbn = rawIsbn.replace(/[^0-9X]/gi, '');
       return {
-        title: (getNS(item, DC, 'title') || get(item, 'title')).replace(/\/.*$/, '').trim(),
-        author: getNS(item, DC, 'creator') || get(item, 'author'),
-        publisher: getNS(item, DC, 'publisher') || get(item, 'publisher'),
-        year: (getNS(item, DC, 'date') || get(item, 'pubDate')).slice(0, 4),
+        title: get(item, 'title').replace(/\s*\/.*$/, '').trim(),
+        author: get(item, 'author'),
+        publisher: get(item, 'publisher'),
+        year: get(item, 'pubDate').slice(0, 4),
         isbn: isbn.length >= 10 ? isbn : '',
         genre: '',
       };
@@ -354,11 +349,7 @@ async function doLookup() {
 
     window._candidates = candidates;
   } catch(e) {
-    if (e.name === 'AbortError') {
-      area.innerHTML = '<div class="lookup-msg error">タイムアウトしました。時間をおいて再試行してください。</div>';
-    } else {
-      area.innerHTML = '<div class="lookup-msg error">エラー：' + esc(String(e)) + '</div>';
-    }
+    area.innerHTML = '<div class="lookup-msg error">エラー：' + esc(String(e)) + '</div>';
   }
   btn.disabled = false;
 }
@@ -418,3 +409,11 @@ document.getElementById('saveBtn').addEventListener('click', () => {
     done: false, added: Date.now()
   });
   ['fTitle','fAuthor','fPrice','fGenre','fNote','fIsbn','fPublisher'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fPri').value = 'mi';
+  closeSheet(); save(); render();
+});
+
+load();
+</script>
+</body>
+</html>
