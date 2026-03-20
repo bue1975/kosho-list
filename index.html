@@ -314,7 +314,10 @@ async function doLookup() {
 
   try {
     const url = `https://iss.ndl.go.jp/api/opensearch?title=${encodeURIComponent(q)}&mediatype=1&cnt=5`;
-    const res = await fetch(url);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timer);
     const text = await res.text();
     const xml = new DOMParser().parseFromString(text, 'application/xml');
     const items = Array.from(xml.querySelectorAll('item'));
@@ -349,7 +352,11 @@ async function doLookup() {
 
     window._candidates = candidates;
   } catch(e) {
-    area.innerHTML = '<div class="lookup-msg error">エラー：' + esc(String(e)) + '</div>';
+    if (e.name === 'AbortError') {
+      area.innerHTML = '<div class="lookup-msg error">タイムアウトしました。時間をおいて再試行してください。</div>';
+    } else {
+      area.innerHTML = '<div class="lookup-msg error">エラー：' + esc(String(e)) + '</div>';
+    }
   }
   btn.disabled = false;
 }
@@ -413,3 +420,7 @@ document.getElementById('saveBtn').addEventListener('click', () => {
   closeSheet(); save(); render();
 });
 
+load();
+</script>
+</body>
+</html>
