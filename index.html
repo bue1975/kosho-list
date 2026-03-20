@@ -156,7 +156,7 @@ body { position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; 
     <h2>本を追加</h2>
 
     <div class="field">
-      <label>書名で書誌情報を検索（Google Books）</label>
+      <label>書名で書誌情報を検索（Google Books） <button onclick="promptApiKey()" style="font-size:10px;padding:2px 6px;border:1px solid var(--paper3);border-radius:4px;background:none;color:var(--ink3);cursor:pointer;font-family:'Noto Sans JP';">APIキー設定</button></label>
       <div class="lookup-row">
         <input id="lookupQ" placeholder="書名・著者名を入力…">
         <button class="btn-lookup" id="lookupBtn">検索</button>
@@ -242,51 +242,50 @@ function renderStats() {
   const total = books.length;
   const done = books.filter(b => b.done).length;
   const hi = books.filter(b => b.priority === 'hi' && !b.done).length;
-  document.getElementById('stats').innerHTML = `
-    <div class="stat"><div class="stat-n">${total}</div><div class="stat-l">総数</div></div>
-    <div class="stat"><div class="stat-n">${total - done}</div><div class="stat-l">未入手</div></div>
-    <div class="stat"><div class="stat-n">${done}</div><div class="stat-l">入手済み</div></div>
-    <div class="stat"><div class="stat-n">${hi}</div><div class="stat-l">高優先</div></div>
-  `;
+  document.getElementById('stats').innerHTML =
+    '<div class="stat"><div class="stat-n">' + total + '</div><div class="stat-l">総数</div></div>' +
+    '<div class="stat"><div class="stat-n">' + (total - done) + '</div><div class="stat-l">未入手</div></div>' +
+    '<div class="stat"><div class="stat-n">' + done + '</div><div class="stat-l">入手済み</div></div>' +
+    '<div class="stat"><div class="stat-n">' + hi + '</div><div class="stat-l">高優先</div></div>';
 }
 
 function renderList() {
-  const q = document.getElementById('search').value.toLowerCase();
-  const s = document.getElementById('sort').value;
-  const priO = {hi:0, mi:1, lo:2};
-  let list = books.filter(b => {
+  var q = document.getElementById('search').value.toLowerCase();
+  var s = document.getElementById('sort').value;
+  var priO = {hi:0, mi:1, lo:2};
+  var list = books.filter(function(b) {
     if (tab === 'want' && b.done) return false;
     if (tab === 'done' && !b.done) return false;
-    if (q && !b.title.toLowerCase().includes(q) && !(b.author||'').toLowerCase().includes(q)) return false;
+    if (q && b.title.toLowerCase().indexOf(q) < 0 && (b.author||'').toLowerCase().indexOf(q) < 0) return false;
     return true;
   });
-  if (s === 'pri') list.sort((a,b) => priO[a.priority] - priO[b.priority]);
-  else if (s === 'title') list.sort((a,b) => a.title.localeCompare(b.title, 'ja'));
-  else list.sort((a,b) => b.added - a.added);
-  list.sort((a,b) => (a.done ? 1 : 0) - (b.done ? 1 : 0));
+  if (s === 'pri') list.sort(function(a,b){ return priO[a.priority] - priO[b.priority]; });
+  else if (s === 'title') list.sort(function(a,b){ return a.title.localeCompare(b.title, 'ja'); });
+  else list.sort(function(a,b){ return b.added - a.added; });
+  list.sort(function(a,b){ return (a.done ? 1 : 0) - (b.done ? 1 : 0); });
 
-  const el = document.getElementById('list');
+  var el = document.getElementById('list');
   if (!list.length) { el.innerHTML = '<div class="empty">該当する本がありません</div>'; return; }
 
-  const priL = {hi:'優先：高', mi:'優先：中', lo:'優先：低'};
-  const priC = {hi:'b-hi', mi:'b-mi', lo:'b-lo'};
-  el.innerHTML = list.map(b => `
-    <div class="card ${b.done ? 'done' : ''}">
-      <button class="chk ${b.done ? 'on' : ''}" onclick="toggle(${b.id})">${b.done ? '✓' : ''}</button>
-      <div class="info">
-        <div class="c-title">${esc(b.title)}</div>
-        ${b.author ? `<div class="c-author">${esc(b.author)}${b.publisher ? '　' + esc(b.publisher) : ''}</div>` : ''}
-        <div class="meta">
-          <span class="badge ${priC[b.priority]}">${priL[b.priority]}</span>
-          ${b.genre ? `<span class="badge b-lo">${esc(b.genre)}</span>` : ''}
-          ${b.isbn ? `<span class="badge b-lo">ISBN ${esc(b.isbn)}</span>` : ''}
-          ${b.price ? `<span class="badge b-price">〜${Number(b.price).toLocaleString()}円</span>` : ''}
-          ${b.note ? `<span class="badge b-note">${esc(b.note)}</span>` : ''}
-        </div>
-      </div>
-      <button class="del-btn" onclick="del(${b.id})">✕</button>
-    </div>
-  `).join('');
+  var priL = {hi:'優先：高', mi:'優先：中', lo:'優先：低'};
+  var priC = {hi:'b-hi', mi:'b-mi', lo:'b-lo'};
+  el.innerHTML = list.map(function(b) {
+    return '<div class="card ' + (b.done ? 'done' : '') + '">' +
+      '<button class="chk ' + (b.done ? 'on' : '') + '" onclick="toggle(' + b.id + ')">' + (b.done ? '✓' : '') + '</button>' +
+      '<div class="info">' +
+        '<div class="c-title">' + esc(b.title) + '</div>' +
+        (b.author ? '<div class="c-author">' + esc(b.author) + (b.publisher ? '　' + esc(b.publisher) : '') + '</div>' : '') +
+        '<div class="meta">' +
+          '<span class="badge ' + priC[b.priority] + '">' + priL[b.priority] + '</span>' +
+          (b.genre ? '<span class="badge b-lo">' + esc(b.genre) + '</span>' : '') +
+          (b.isbn ? '<span class="badge b-lo">ISBN ' + esc(b.isbn) + '</span>' : '') +
+          (b.price ? '<span class="badge b-price">〜' + Number(b.price).toLocaleString() + '円</span>' : '') +
+          (b.note ? '<span class="badge b-note">' + esc(b.note) + '</span>' : '') +
+        '</div>' +
+      '</div>' +
+      '<button class="del-btn" onclick="del(' + b.id + ')">✕</button>' +
+    '</div>';
+  }).join('');
 }
 
 function esc(s) {
@@ -294,83 +293,79 @@ function esc(s) {
 }
 
 function toggle(id) {
-  const b = books.find(x => x.id === id);
+  var b = books.find(function(x){ return x.id === id; });
   if (b) { b.done = !b.done; save(); render(); }
 }
 
 function del(id) {
   if (!confirm('削除しますか？')) return;
-  books = books.filter(x => x.id !== id);
+  books = books.filter(function(x){ return x.id !== id; });
   save(); render();
 }
 
+var GBOOKS_KEY = '';
+
+function setGBooksKey(k) {
+  GBOOKS_KEY = k;
+  sessionStorage.setItem('gbk', k);
+}
+
 async function doLookup() {
-  const q = document.getElementById('lookupQ').value.trim();
+  var q = document.getElementById('lookupQ').value.trim();
   if (!q) return;
-  const btn = document.getElementById('lookupBtn');
-  const area = document.getElementById('lookupArea');
+  var btn = document.getElementById('lookupBtn');
+  var area = document.getElementById('lookupArea');
+
+  if (!GBOOKS_KEY) {
+    area.innerHTML = '<div class="lookup-msg error">APIキーが設定されていません。設定ボタンから入力してください。</div>';
+    return;
+  }
+
   btn.disabled = true;
   area.innerHTML = '<div class="lookup-msg"><span class="lookup-spinner"></span>検索中…</div>';
 
   try {
-    const apiKey = 'AIzaSyDhh83IwIWemMoCjQyAsmrW3VEDh5-6_MQ';
-    let items = null;
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 10000);
-    const res1 = await fetch(`https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(q)}&key=${apiKey}&maxResults=5&printType=books`, { signal: controller.signal });
-    clearTimeout(timer);
-    const data1 = await res1.json();
-    if (data1.items && data1.items.length > 0) {
-      items = data1.items;
-    } else {
-      const res2 = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&key=${apiKey}&maxResults=5&printType=books`);
-      const data2 = await res2.json();
-      if (data2.items && data2.items.length > 0) {
-        items = data2.items;
-      }
-    }
+    var url = 'https://www.googleapis.com/books/v1/volumes?q=' + encodeURIComponent(q) + '&key=' + GBOOKS_KEY + '&maxResults=5&printType=books';
+    var res = await fetch(url);
+    var data = await res.json();
 
-    if (!items) {
-      area.innerHTML = '<div class="lookup-msg error">見つかりませんでした。別のキーワードや著者名で試してください。</div>';
+    if (!data.items || !data.items.length) {
+      area.innerHTML = '<div class="lookup-msg error">見つかりませんでした。別のキーワードで試してください。</div>';
       btn.disabled = false;
       return;
     }
 
-    const candidates = items.slice(0, 4).map(item => {
-      const info = item.volumeInfo;
-      const isbn13 = (info.industryIdentifiers || []).find(x => x.type === 'ISBN_13');
-      const isbn10 = (info.industryIdentifiers || []).find(x => x.type === 'ISBN_10');
+    window._cands = data.items.slice(0, 4).map(function(item) {
+      var info = item.volumeInfo;
+      var ids = info.industryIdentifiers || [];
+      var isbn13 = ids.find(function(x){ return x.type === 'ISBN_13'; });
+      var isbn10 = ids.find(function(x){ return x.type === 'ISBN_10'; });
       return {
         title: info.title || '',
         author: (info.authors || []).join('・'),
         publisher: info.publisher || '',
-        year: info.publishedDate ? info.publishedDate.slice(0,4) : '',
+        year: (info.publishedDate || '').slice(0,4),
         isbn: isbn13 ? isbn13.identifier : (isbn10 ? isbn10.identifier : ''),
         genre: (info.categories || []).join('・'),
       };
     });
 
-    area.innerHTML = '<div class="candidates">' + candidates.map((c, i) => `
-      <div class="candidate" onclick="applyCandidate(${i})">
-        <div class="candidate-title">${esc(c.title)}</div>
-        <div class="candidate-sub">${[c.author, c.publisher, c.year].filter(Boolean).join('　')}</div>
-        ${c.isbn ? `<div class="candidate-sub">ISBN ${esc(c.isbn)}</div>` : ''}
-      </div>
-    `).join('') + '</div>';
+    area.innerHTML = '<div class="candidates">' + window._cands.map(function(c, i) {
+      return '<div class="candidate" onclick="applyCandidate(' + i + ')">' +
+        '<div class="candidate-title">' + esc(c.title) + '</div>' +
+        '<div class="candidate-sub">' + [c.author, c.publisher, c.year].filter(Boolean).join('　') + '</div>' +
+        (c.isbn ? '<div class="candidate-sub">ISBN ' + esc(c.isbn) + '</div>' : '') +
+      '</div>';
+    }).join('') + '</div>';
 
-    window._candidates = candidates;
   } catch(e) {
-    if (e.name === 'AbortError') {
-      area.innerHTML = '<div class="lookup-msg error">タイムアウトしました。時間をおいて再試行してください。</div>';
-    } else {
-      area.innerHTML = '<div class="lookup-msg error">エラー：' + esc(String(e)) + '</div>';
-    }
+    area.innerHTML = '<div class="lookup-msg error">エラー：' + esc(String(e)) + '</div>';
   }
   btn.disabled = false;
 }
 
 function applyCandidate(i) {
-  const c = window._candidates[i];
+  var c = window._cands[i];
   if (!c) return;
   if (c.title) document.getElementById('fTitle').value = c.title;
   if (c.author) document.getElementById('fAuthor').value = c.author;
@@ -380,9 +375,9 @@ function applyCandidate(i) {
   document.getElementById('lookupArea').innerHTML = '<div class="lookup-msg">✓ 反映しました。内容を確認して保存してください。</div>';
 }
 
-document.querySelectorAll('.tab').forEach(t => {
-  t.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
+document.querySelectorAll('.tab').forEach(function(t) {
+  t.addEventListener('click', function() {
+    document.querySelectorAll('.tab').forEach(function(x){ x.classList.remove('on'); });
     t.classList.add('on');
     tab = t.dataset.tab;
     render();
@@ -392,28 +387,32 @@ document.querySelectorAll('.tab').forEach(t => {
 document.getElementById('search').addEventListener('input', render);
 document.getElementById('sort').addEventListener('change', render);
 
-document.getElementById('openAdd').addEventListener('click', () => {
+document.getElementById('openAdd').addEventListener('click', function() {
   document.getElementById('overlay').classList.remove('hidden');
 });
+
 function closeSheet() {
   document.getElementById('overlay').classList.add('hidden');
   document.getElementById('lookupArea').innerHTML = '';
   document.getElementById('lookupQ').value = '';
-  window._candidates = [];
+  window._cands = [];
 }
+
 document.getElementById('closeAdd').addEventListener('click', closeSheet);
-document.getElementById('overlay').addEventListener('click', e => {
+document.getElementById('overlay').addEventListener('click', function(e) {
   if (e.target === document.getElementById('overlay')) closeSheet();
 });
 
 document.getElementById('lookupBtn').addEventListener('click', doLookup);
-document.getElementById('lookupQ').addEventListener('keydown', e => { if (e.key === 'Enter') doLookup(); });
+document.getElementById('lookupQ').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') doLookup();
+});
 
-document.getElementById('saveBtn').addEventListener('click', () => {
-  const title = document.getElementById('fTitle').value.trim();
+document.getElementById('saveBtn').addEventListener('click', function() {
+  var title = document.getElementById('fTitle').value.trim();
   if (!title) { document.getElementById('fTitle').focus(); return; }
   books.unshift({
-    id: Date.now(), title,
+    id: Date.now(), title: title,
     author: document.getElementById('fAuthor').value.trim(),
     price: document.getElementById('fPrice').value.trim(),
     priority: document.getElementById('fPri').value,
@@ -423,10 +422,21 @@ document.getElementById('saveBtn').addEventListener('click', () => {
     publisher: document.getElementById('fPublisher').value.trim(),
     done: false, added: Date.now()
   });
-  ['fTitle','fAuthor','fPrice','fGenre','fNote','fIsbn','fPublisher'].forEach(id => document.getElementById(id).value = '');
+  ['fTitle','fAuthor','fPrice','fGenre','fNote','fIsbn','fPublisher'].forEach(function(id){ document.getElementById(id).value = ''; });
   document.getElementById('fPri').value = 'mi';
   closeSheet(); save(); render();
 });
+
+var sk = sessionStorage.getItem('gbk');
+if (sk) GBOOKS_KEY = sk;
+
+function promptApiKey() {
+  var k = prompt('Google Books APIキーを入力してください：');
+  if (k && k.trim()) {
+    setGBooksKey(k.trim());
+    alert('APIキーを設定しました。');
+  }
+}
 
 load();
 </script>
