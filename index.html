@@ -263,6 +263,7 @@ function renderList() {
   if (s === 'pri') list.sort((a,b) => priO[a.priority] - priO[b.priority]);
   else if (s === 'title') list.sort((a,b) => a.title.localeCompare(b.title, 'ja'));
   else list.sort((a,b) => b.added - a.added);
+  list.sort((a,b) => (a.done ? 1 : 0) - (b.done ? 1 : 0));
 
   const el = document.getElementById('list');
   if (!list.length) { el.innerHTML = '<div class="empty">該当する本がありません</div>'; return; }
